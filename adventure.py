@@ -1,8 +1,4 @@
 
-
-game=True
-
-
 from random import randint
 import pygame
 
@@ -53,10 +49,11 @@ def screenchangedub(dir):
     changebg=dir
     enemyspawn=1
     locks=1
+
                  
             
 
-def getimage(pic,strwidth,width,height,scale,bordcol):
+def getimage(pic,strwidth,strheight,width,height,scale,bordcol):
     """
     takes image and makes it a sprite also can pick what part of the image too use(spritesheets)
     args the image file, starting width in the file where to put the bottom right(width,height) scale of the image and color to remove
@@ -72,11 +69,6 @@ def getimage(pic,strwidth,width,height,scale,bordcol):
 
 class Background(pygame.sprite.Sprite):
         def __init__(self):
-            """
-            creates image rect and surf for background
-            takes self as arg
-            returns none
-            """
             pygame.sprite.Sprite.__init__(self)
             global grimg
             self.image=grimg
@@ -120,50 +112,50 @@ class Background(pygame.sprite.Sprite):
                      vertcount=0
 class Doorlock(pygame.sprite.Sprite):
         def __init__(self,side):
-            """
-            creates surface rect and image depending on which side was passed
-            takes self as arg
-            returns none
-            """
             pygame.sprite.Sprite.__init__(self)
             global inv
             global lockeddoor
             global enemycounter
             global currentroom
-            sidelock=pygame.surface.Surface((screenwide/10,screenhigh/5))
-            updownlock=pygame.surface.Surface((screenwide/5,screenhigh/10))
-            if side=="right":
+            global changebg
+            global screenwide
+            global screenhigh
+            if side=="left" and currentroom not in (1,4,7):
+                
                 self.surf=pygame.surface.Surface((screenwide/10,screenhigh/5))
-                self.rect=sidelock.get_rect()
+                self.rect=self.surf.get_rect()
                 self.rect.left=0
                 self.rect.top=screenhigh/10*4
-                self.image=getimage(lockeddoor,0,128,256,2,"white")
-            if side=="left":
+                self.image=getimage(lockeddoor,128,0,128,256,.6,"white")
+            if side=="right"and currentroom not in (3,6,9):
+                
                 self.surf=pygame.surface.Surface((screenwide/10,screenhigh/5))
-                self.rect=sidelock.get_rect()
+                self.rect=self.surf.get_rect()
                 self.rect.right=screenwide
                 self.rect.top=screenhigh/10*4
-                self.image=getimage(lockeddoor,128,256,256,2,"white")
-            if side=="top":
+                self.image=getimage(lockeddoor,0,0,128,256,.6,"white")
+            if side=="top" and currentroom not in (1,2,3):
+                
                 self.surf=pygame.surface.Surface((screenwide/5,screenhigh/10))
-                self.rect=updownlock.get_rect()
+                self.rect=self.surf.get_rect()
                 self.rect.left=screenwide/10*4
                 self.rect.top=0
-                self.image=getimage(lockeddoor,128,256,256,2,"white")
-            if side=="bottom":
+                self.image=getimage(lockeddoor,256,128,256,128,.6,"white")
+            if side=="bottom"and currentroom not in (7,8,9):
+                
                 self.surf=pygame.surface.Surface((screenwide/5,screenhigh/10))
-                self.rect=updownlock.get_rect()
+                self.rect=self.surf.get_rect()
                 self.rect.left=screenwide/10*4
                 self.rect.bottom=screenhigh
-                self.image=getimage(lockeddoor,128,256,256,2,"white")
+                self.image=getimage(lockeddoor,256,0,256,128,.6,"white")
+                
+        def remove(self):
+            if changebg!=0:
+                self.kill()
+            
             
 class Player(pygame.sprite.Sprite):
         def __init__(self):
-            """
-            makes enemy surf and rect
-            takes self as an arg
-            returns none
-            """
             pygame.sprite.Sprite.__init__(self)
             self.char = pygame.surface.Surface((charfat,charfat))
             self.rect = self.char.get_rect(center=(screenwide/2,screenhigh/2))
@@ -273,7 +265,7 @@ class Player(pygame.sprite.Sprite):
                             self.rect.move_ip(-knock,0)
             
                 if shoot_count>=1:
-                    img=getimage(shotgunsheet,(char_animate_frames[move][snum]-1)*32,32,32,2,"white")
+                    img=getimage(shotgunsheet,(char_animate_frames[move][snum]-1)*32,0,32,32,2,"white")
                     self.image=img
                     
                     return True
@@ -291,7 +283,7 @@ class Player(pygame.sprite.Sprite):
             global movean
             global spritesheet
             global img
-            img=getimage(spritesheet,(attack_animate_frames[movean][ancount//3]-1)*32,32,32,2,"white")
+            img=getimage(spritesheet,(attack_animate_frames[movean][ancount//3]-1)*32,0,32,32,2,"white")
             self.image=img
             
         def currentscreenchange(self):
@@ -326,11 +318,6 @@ class Player(pygame.sprite.Sprite):
                         self.rect.top=0
                         change=0
         def movement(self,pressed_keys):
-            """
-            moves player
-            takes self as arg and pressed keys
-            returns none
-            """
             global move
             global movean
             global change
@@ -409,19 +396,9 @@ class Player(pygame.sprite.Sprite):
 
 class Bullet(pygame.sprite.Sprite):
         def __init__(self):
-            """
-            makes bullet surface
-            takes self as arg
-            returns none
-            """
             pygame.sprite.Sprite.__init__(self)
             self.surf=pygame.surface.Surface((charfat,charfat))
         def shoot(self):
-            """
-            creates image for explosion and locates the rect for the damage
-            takes self as arg
-            returns none
-            """
             global boom_location
             global player
             global shoot_count
@@ -435,15 +412,10 @@ class Bullet(pygame.sprite.Sprite):
             if shoot_count>=18:
                  self.rect=self.surf.get_rect(center=(-500,-500))
             
-            self.image=getimage(explode,0,128,128,.5,"white")
+            self.image=getimage(explode,0,0,128,128,.5,"white")
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self):
-            """
-            makes enemies
-            takes self as arg
-            returns none
-            """
             global currentroom
             pygame.sprite.Sprite.__init__(self)
             self.surf=pygame.surface.Surface((charfat,charfat))
@@ -457,23 +429,19 @@ class Enemy(pygame.sprite.Sprite):
             self.rect=self.surf.get_rect(center=spawncenter)
             self.surf.fill((0,0,0))
     def animate(self):
-         """
-            animates enemy
-            takes self as arg
-            returns none
-         """
          global ancount
          if self.move_dir in (1,2,3):
               frames=(3,4)
          else:
               frames=(1,2)
          imageanimate=frames[ancount//3]-1
-         animated=getimage(slimesheet,imageanimate*64,64,64,1,"white")
+         animated=getimage(slimesheet,imageanimate*64,0,64,64,1,"white")
          self.image=animated
     def die(self):
         global changebg
         global currentroom
         global bullets
+        global enemycounter
         if changebg>0:
              self.kill()
 
@@ -485,11 +453,6 @@ class Enemy(pygame.sprite.Sprite):
         except:
              pass 
     def move(self):
-        """
-            randomly moves enemy
-            takes self as arg
-            returns none
-        """
         movespeed=2
         diagnolmod=.75
         dir_change=randint(1,50)
@@ -512,11 +475,6 @@ class Enemy(pygame.sprite.Sprite):
         if self.move_dir==8:
              self.rect.move_ip(movespeed,0)
     def wallstop(self):
-        """
-            keeps enemy from going out of bounds
-            takes self as arg
-            returns none
-        """
         if self.rect.right>screenwide:
             self.rect.right=screenwide
             self.move_dir=7
@@ -532,25 +490,12 @@ class Enemy(pygame.sprite.Sprite):
     
 class Pickupitem(pygame.sprite.Sprite):
     def __init__(self):
-        """
-        creates surf for pickupitem
-        """
         pygame.sprite.Sprite.__init__(self)
         self.surf=pygame.surface.Surface((charfat/2,charfat/2))
     def place(self,x,y,picture):
-        """
-        makes a rect and image for the surf
-        takes self x vale and y value for placement and the picture to be used for drawing it
-        returns none
-        """
         self.rect=self.surf.get_rect(center=(x,y))
         self.image=picture
     def collected(self,name):
-        """
-            kills self and adds name to the list inv when player collides with self
-            takes self as arg and name to append to list
-            returns none
-        """
         global player
         if pygame.Rect.colliderect(player.rect,self.rect):
              inv.append(name)
@@ -559,7 +504,7 @@ class Pickupitem(pygame.sprite.Sprite):
 
                 
 youdied=False                 
-
+game=True               
 title=True    
 pygame.init()
 
@@ -580,7 +525,7 @@ while game:
     stored_shot=False
     tookhit=False
     locks=1
-    enemycounter={0:(3,"open"),1:(3,"open"),2:(3,"open"),3:(0,"locked","chariott"),4:(3,"open"),5:(3,"open"),6:(3,"open"),7:(3,"open"),8:(3,"open"),9:(3,"open")}
+    enemycounter={0:[3,"open"],1:[3,"open"],2:[3,"open"],3:[0,"locked","chariott"],4:[3,"open"],5:[3,"open"],6:[3,"open"],7:[3,"open"],8:[3,"open"],9:[3,"open"]}
     move=0
     boom_animate=0
     shooty=False
@@ -596,11 +541,11 @@ while game:
     FPS = 40
     changebg=0
     change=0
-    dstitle=getimage(titletext,0,954,79,.733,"black")
-    grimg=getimage(grassheet,0,2880,2880,.7291,"white")
-    hearts=getimage(heart,0,16,16,4,"white")
-    emptyhearts=getimage(heart,16,16,16,4,"white")
-    keypic=getimage(key,0,64,64,.5,"white")
+    dstitle=getimage(titletext,0,0,954,79,.733,"black")
+    grimg=getimage(grassheet,0,0,2880,2880,.7291,"white")
+    hearts=getimage(heart,0,0,16,16,4,"white")
+    emptyhearts=getimage(heart,16,0,16,16,4,"white")
+    keypic=getimage(key,0,0,64,64,.5,"white")
     #create player background and enemies
     background=Background()
     playergroup=pygame.sprite.Group()
@@ -658,34 +603,34 @@ while game:
         clock.tick(FPS)
         pressed_keys = pygame.key.get_pressed()
         if changebg==0 and locks==1:
-            print("y")
             locks=0
             try:
-                if enemycounter[currentroom-1][1]==("locked"):
+                if enemycounter[currentroom-1][1]==("locked")and currentroom not in (1,4,7):
                     lockleft=Doorlock("left")
                     lockleft.add(lockgroup)
             except:
                 continue
             try:    
-                if enemycounter[currentroom+1][1]==("locked"):
+                if enemycounter[currentroom+1][1]==("locked")and currentroom not in (3,6,9):
                     lockright=Doorlock("right")
                     lockright.add(lockgroup)
+                    
             except:
                 continue
             try:
-                if enemycounter[currentroom-3][1]==("locked"):
+                if enemycounter[currentroom-3][1]==("locked")and currentroom not in (1,2,3):
                     locktop=Doorlock("top")
                     lockgroup.add(locktop)
             except:
                 continue
             try:
-                if enemycounter[currentroom+3][1]==("locked"):
+                if enemycounter[currentroom+3][1]==("locked")and currentroom not in (7,8,9):
                     lockbottom=Doorlock("bottom")
                     lockgroup.add(lockbottom)
             except:
                 continue
         
-
+        #create enemies
         if enemyspawn==1 and changebg==0:
             enemyspawn=0
             if enemycounter[currentroom][0]==3:
@@ -708,8 +653,8 @@ while game:
 
 
 
-    
-        player.die()
+        if changebg==0:
+            player.die()
         
         attack=player.shotgun()  
 
@@ -745,7 +690,12 @@ while game:
         
         #place background and player
         screen.blit(grimg,background.rect)
-
+        lockgroup.update()
+        for lock in lockgroup:
+            lock.remove()
+        if len(lockgroup)>0:
+            lockgroup.draw(screen)
+        playergroup.update()
         if iframes<10 or ancount<4:            
             playergroup.draw(screen)
 
