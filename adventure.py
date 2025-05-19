@@ -365,31 +365,31 @@ class Player(pygame.sprite.Sprite):
                 global change
                 global background
                 if change==0:
-                    if self.rect.right>screenwide and self.rect.top<screenhigh/2-1.5*charfat or self.rect.right>screenwide and self.rect.bottom>screenhigh/2+1.5*charfat or self.rect.right>screenwide and background.rect.right==screenwide:
+                    if self.rect.right>screenwide and (self.rect.top<screenhigh/2-1.5*charfat or self.rect.bottom>screenhigh/2+1.5*charfat or background.rect.right==screenwide or enemycounter[currentroom+1][1]=="locked"):
                             self.rect.right=screenwide
-                    if self.rect.left < 0 and self.rect.top<screenhigh/2-1.5*charfat or self.rect.left < 0 and self.rect.bottom>screenhigh/2+1.5*charfat or self.rect.left < 0 and background.rect.left==0:
+                    if self.rect.left < 0 and (self.rect.top<screenhigh/2-1.5*charfat or self.rect.bottom>screenhigh/2+1.5*charfat or background.rect.left==0 or enemycounter[currentroom-1][1]=="locked"):
                             self.rect.left=0   
-                    if self.rect.top<0 and self.rect.left<screenwide/2-1.5*charfat or self.rect.top<0 and self.rect.right>screenwide/2+1.5*charfat or self.rect.top < 0 and background.rect.top==0:
+                    if self.rect.top<0 and (self.rect.left<screenwide/2-1.5*charfat or self.rect.right>screenwide/2+1.5*charfat or background.rect.top==0 or enemycounter[currentroom-3][1]=="locked"):
                             self.rect.top=0
-                    if self.rect.bottom>screenhigh and self.rect.left<screenwide/2-1.5*charfat or self.rect.bottom>screenhigh and self.rect.right>screenwide/2+1.5*charfat or self.rect.bottom>screenhigh and background.rect.bottom==screenhigh:
+                    if self.rect.bottom>screenhigh and (self.rect.left<screenwide/2-1.5*charfat or self.rect.right>screenwide/2+1.5*charfat or  background.rect.bottom==screenhigh enemycounter[currentroom+3][1]=="locked"):
                             self.rect.bottom=screenhigh
             
 
 
                 if self.rect.top<0 or self.rect.bottom>screenhigh or self.rect.right>screenwide or self.rect.left<0:
-                        if self.rect.left < 0:
+                        if self.rect.left < 0 and enemycounter[currentroom-1][1]=="open":
                             self.rect.left=0
                             screenchangedub(1)
                             currentroom-=1
-                        if self.rect.right>screenwide:
+                        if self.rect.right>screenwide and enemycounter[currentroom+1][1]=="open":
                             self.rect.right=screenwide
                             screenchangedub(2)
                             currentroom+=1
-                        if self.rect.top<0:
+                        if self.rect.top<0 and enemycounter[currentroom-3][1]=="open":
                             self.rect.top=0
                             screenchangedub(3)
                             currentroom-=3
-                        if self.rect.bottom>screenhigh:
+                        if self.rect.bottom>screenhigh and enemycounter[currentroom+3][1]=="open":
                             self.rect.bottom=screenhigh
                             screenchangedub(4)  
                             currentroom+=3
