@@ -371,7 +371,7 @@ class Player(pygame.sprite.Sprite):
                             self.rect.left=0   
                     if self.rect.top<0 and (self.rect.left<screenwide/2-1.5*charfat or self.rect.right>screenwide/2+1.5*charfat or background.rect.top==0 or enemycounter[currentroom-3][1]=="locked"):
                             self.rect.top=0
-                    if self.rect.bottom>screenhigh and (self.rect.left<screenwide/2-1.5*charfat or self.rect.right>screenwide/2+1.5*charfat or  background.rect.bottom==screenhigh enemycounter[currentroom+3][1]=="locked"):
+                    if self.rect.bottom>screenhigh and (self.rect.left<screenwide/2-1.5*charfat or self.rect.right>screenwide/2+1.5*charfat or background.rect.bottom==screenhigh or enemycounter[currentroom+3][1]=="locked"):
                             self.rect.bottom=screenhigh
             
 
