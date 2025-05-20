@@ -120,6 +120,7 @@ class Doorlock(pygame.sprite.Sprite):
             global changebg
             global screenwide
             global screenhigh
+            self.side = side
             if side=="left" and currentroom not in (1,4,7):
                 
                 self.surf=pygame.surface.Surface((screenwide/10,screenhigh/5))
@@ -148,6 +149,21 @@ class Doorlock(pygame.sprite.Sprite):
                 self.rect.left=screenwide/10*4
                 self.rect.bottom=screenhigh
                 self.image=getimage(lockeddoor,256,0,256,128,.6,"white")
+        def open(self, ):
+            global inv
+            global player
+            global currentroom
+            global enemycounter
+            if pygame.Rect.colliderect(self.rect,player) and len(inv[0])>0:  
+                inv[0].pop(0)
+                if self.side == "left":
+                    enemycounter[currentroom-1][1]="open"
+                if self.side == "right":
+                    enemycounter[currentroom+1][1]="open"
+                if self.side == "bottom":
+                    enemycounter[currentroom+3][1]="open"
+                if self.side == "top":
+                    enemycounter[currentroom-3][1]="open"
                 
         def remove(self):
             if changebg!=0:
@@ -489,17 +505,26 @@ class Enemy(pygame.sprite.Sprite):
             self.move_dir=2
     
 class Pickupitem(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self,name,picture):
         pygame.sprite.Sprite.__init__(self)
         self.surf=pygame.surface.Surface((charfat/2,charfat/2))
-    def place(self,x,y,picture):
-        self.rect=self.surf.get_rect(center=(x,y))
+        self.name=name
+        self.rect=self.surf.get_rect(center=(-5000,-5000))
         self.image=picture
-    def collected(self,name):
+    def place(self,x,y):
+        try:
+            if enemycounter[currentroom][2]=="key" and enemycounter[currentroom][0]==0:
+                self.rect=self.surf.get_rect(center=(x,y)) 
+        except:
+            pass
+    def collected(self):
         global player
-        if pygame.Rect.colliderect(player.rect,self.rect):
-             inv.append(name)
+        try:
+            if pygame.Rect.colliderect(player.rect,self.rect):
+             inv[0].append(self.name)
              self.kill()
+        except:
+            pass
 
 
                 
@@ -518,14 +543,14 @@ while game:
         
 
     #background and time variables and constant images
-    inv=[]
+    inv=[[]]
     y=0
     x=0
     storedmove=8
     stored_shot=False
     tookhit=False
     locks=1
-    enemycounter={0:[3,"open"],1:[3,"open"],2:[3,"open"],3:[0,"locked","chariott"],4:[3,"open"],5:[3,"open"],6:[3,"open"],7:[3,"open"],8:[3,"open"],9:[3,"open"]}
+    enemycounter={0:[3,"open",""],1:[3,"open",""],2:[3,"open",""],3:[0,"locked","chariott"],4:[3,"open",""],5:[3,"open",""],6:[3,"open",""],7:[3,"open","key"],8:[3,"open",""],9:[3,"open",""]}
     move=0
     boom_animate=0
     shooty=False
@@ -559,8 +584,10 @@ while game:
     player=Player()
     projectiles.add(bullets)
     playergroup.add(player)
-    key1=Pickupitem()
+    key1=Pickupitem("key1",keypic)
+    
     keys.add(key1)
+
     horcount=0
     vertcount=0
 
@@ -648,9 +675,6 @@ while game:
             for enemy in enemies:
                 enemy.move_dir=0
 
-            for lock in lockgroup:
-                continue
-
 
 
         if changebg==0:
@@ -693,6 +717,7 @@ while game:
         lockgroup.update()
         for lock in lockgroup:
             lock.remove()
+            lock.open()
         if len(lockgroup)>0:
             lockgroup.draw(screen)
         playergroup.update()
@@ -701,12 +726,12 @@ while game:
 
         enemies.update()
         enemies.draw(screen)
-        if currentroom==7 and enemycounter[currentroom][0]==0:
-            
-            key1.place(350,350,keypic)
-            key1.collected("key1")
-            keys.update()
-            keys.draw(screen)
+        
+        for key in keys:    
+            key.place(350,350)
+            key.collected()
+        keys.update()
+        keys.draw(screen)
             
 
         #stores space bar input and direction
